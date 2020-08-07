@@ -1,6 +1,9 @@
-# 2D-Platformer
+# Mario-style 2D Platformer game from scratch using C++ and Direct2D
 
-https://youtu.be/0QNucPG6TRA
+Part 1: https://youtu.be/0QNucPG6TRA
+
+Part 2: https://youtu.be/YHkv_7VGBrI
+
 
 I'm describing how I've built a 2D platformer game similar to Mario using Visual C++ and Direct2D.
 
