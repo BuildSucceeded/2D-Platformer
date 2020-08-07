@@ -14,6 +14,7 @@ Level::Level()
 		{
 			levelMatrix[i][j] = -1;
 			levelSolids[i][j] = false;
+			levelCollectible[i][j] = false;
 		}
 	}
 
@@ -28,6 +29,7 @@ Level::Level()
 			{
 				myfile >> levelMatrix[i][j];
 				levelSolids[i][j] = tileIsSolid(levelMatrix[i][j]);
+				levelCollectible[i][j] = tileIsCollectible(levelMatrix[i][j]);
 			}
 		}
 	}
@@ -196,11 +198,117 @@ CollisionDistances Level::CharacterCollides(Character* character)
 	return cummulatedCollision;
 }
 
+int Level::PickUpCollectibles(Character* character)
+{
+	// this method checks for collisions with coins and returns the number
+	int noCollisions = 0;
+	
+	double charTop = character->GetPosition().y - CHARACTER_HEIGHT;
+	double charBottom = character->GetPosition().y;
+	double charLeft = character->GetPosition().x - CHARACTER_WIDTH / 2 + 3;
+	double charRight = character->GetPosition().x + CHARACTER_WIDTH / 2 - 4;
+
+	int startX = (int)(charLeft / TILE_WIDTH);
+	if (startX < 0)
+		startX = 0;
+	int startY = (int)(charTop / TILE_WIDTH);
+	if (startY < 0)
+		startY = 0;
+	int endX = (int)(charRight / TILE_WIDTH);
+	if (endX > LEVEL_WIDTH - 1)
+		endX = LEVEL_WIDTH - 1;
+	int endY = (int)(charBottom / TILE_WIDTH);
+	if (endY > LEVEL_HEIGHT - 1)
+		endY = LEVEL_HEIGHT - 1;
+
+	for (int i = startY; i <= endY; i++)
+	{
+		for (int j = startX; j <= endX; j++)
+		{
+			if (levelCollectible[i][j])
+			{
+				double tileTop = i * TILE_WIDTH;
+				double tileBottom = (i + 1) * TILE_WIDTH - 1;
+				double tileLeft = j * TILE_WIDTH;
+				double tileRight = (j + 1) * TILE_WIDTH - 1;
+
+				// If it's a collision
+				if (charTop < tileBottom && charBottom > tileTop && charRight > tileLeft && charLeft < tileRight)
+				{
+					noCollisions++;
+					levelMatrix[i][j] = -1; // remove the coin by resetting the tile position
+					levelCollectible[i][j] = false;
+				}
+			}
+		}
+	}
+
+	return noCollisions;
+}
+
+bool Level::LevelExit(Character* character)
+{
+	// returns true if the character collides with the level exit portal
+	int noCollisions = 0;
+
+	double charTop = character->GetPosition().y - CHARACTER_HEIGHT;
+	double charBottom = character->GetPosition().y;
+	double charLeft = character->GetPosition().x - CHARACTER_WIDTH / 2 + 3;
+	double charRight = character->GetPosition().x + CHARACTER_WIDTH / 2 - 4;
+
+	int startX = (int)(charLeft / TILE_WIDTH);
+	if (startX < 0)
+		startX = 0;
+	int startY = (int)(charTop / TILE_WIDTH);
+	if (startY < 0)
+		startY = 0;
+	int endX = (int)(charRight / TILE_WIDTH);
+	if (endX > LEVEL_WIDTH - 1)
+		endX = LEVEL_WIDTH - 1;
+	int endY = (int)(charBottom / TILE_WIDTH);
+	if (endY > LEVEL_HEIGHT - 1)
+		endY = LEVEL_HEIGHT - 1;
+
+	for (int i = startY; i <= endY; i++)
+	{
+		for (int j = startX; j <= endX; j++)
+		{
+			if (levelMatrix[i][j] == 11)
+			{
+				double tileTop = i * TILE_WIDTH;
+				double tileBottom = (i + 1) * TILE_WIDTH - 1;
+				double tileLeft = j * TILE_WIDTH;
+				double tileRight = (j + 1) * TILE_WIDTH - 1;
+
+				// If it's a collision
+				if (charTop < tileBottom && charBottom > tileTop&& charRight > tileLeft&& charLeft < tileRight)
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 bool Level::tileIsSolid(int tileNo)
 {
 	for (int i = 0; i < 34; i++)
 	{
 		if (solids[i] == tileNo)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Level::tileIsCollectible(int tileNo)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		if (collectibles[i] == tileNo)
 		{
 			return true;
 		}

@@ -21,6 +21,9 @@ public:
 	void BounceTop();
 	void StopMovingLeft(double collisionSize);
 	void StopMovingRight(double collisionSize);
+	void Die();
+	bool IsDead();
+	void Reset();
 
 	bool GoesLeft;
 	bool GoesRight;
@@ -29,5 +32,11 @@ private:
 	ID2D1Bitmap* tileSetImg;
 
 	Point2D speed;
+	Point2D prevPosition;
+
+	bool forward;
+
+	bool dead;
+
 };
 
